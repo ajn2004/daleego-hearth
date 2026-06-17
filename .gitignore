@@ -3,3 +3,4 @@ AGENTS.md
 .envrc
 */.envrc
 */.env
+app/*/tmp/

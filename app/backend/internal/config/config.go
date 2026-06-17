@@ -8,6 +8,7 @@ import (
 type Config struct {
 	Port        string
 	DatabaseURL string
+	AdminAPIKey string
 }
 
 func Load() (Config, error) {
@@ -18,6 +19,7 @@ func Load() (Config, error) {
 	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")
 	dbSSLMode := os.Getenv("DB_SSLMODE")
+	AdminAPIKey := os.Getenv("ADMIN_API_KEY")
 
 	if dbUser == "" {
 		return Config{}, fmt.Errorf("DB_USER environment variable is required")
@@ -41,6 +43,9 @@ func Load() (Config, error) {
 	if dbSSLMode == "" {
 		dbSSLMode = "disable"
 	}
+	if AdminAPIKey == "" {
+		return Config{}, fmt.Errorf("ADMIN_API_KEY environment variable is required")
+	}
 
 	databaseURL := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=%s",
@@ -54,6 +59,7 @@ func Load() (Config, error) {
 	cfg := Config{
 		Port:        os.Getenv("PORT"),
 		DatabaseURL: databaseURL,
+		AdminAPIKey: AdminAPIKey,
 	}
 
 	if cfg.Port == "" {

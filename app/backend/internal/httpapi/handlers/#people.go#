@@ -1,0 +1,24 @@
+// httpapi/handlers/people.go
+package handlers
+
+/*
+API Structure
+GET /admin/people/
+Description: lists all people on platform
+
+POST /admin/people/
+Description: creates a new person
+Payload: Display_name, role{member, admin}
+Returns: New Database object
+
+Get /people/{person_id}
+Returns: Database object of person person_id
+
+PATCH /people/{person_id}/devices/{device_id}
+Description: Updates Device Name
+Payload: new_device_name
+Returns: Updated database object
+
+DELTE /people/{person_id}/devices/{device_id}
+Description: Updates device to deleted
+*/
