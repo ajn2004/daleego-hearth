@@ -22,6 +22,6 @@ func (h *Handler) Routes() chi.Router {
 	h.registerPeopleRoutes(r)
 	h.registerDeviceRoutes(r)
 	h.registerPairingRoutes(r)
-
+	h.registerLocationRoutes(r)
 	return r
 }

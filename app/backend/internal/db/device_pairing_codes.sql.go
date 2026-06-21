@@ -167,6 +167,7 @@ SET
   used_by_device_id = $1::uuid
 WHERE id = $2::uuid
   AND used_at IS NULL
+  and expired_at > now()
 RETURNING id, person_id, code_hash, used_by_device, expires_at, used_at, created_at
 `
 

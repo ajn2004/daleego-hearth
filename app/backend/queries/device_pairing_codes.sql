@@ -37,6 +37,7 @@ SET
   used_by_device_id = sqlc.arg('device_id')::uuid
 WHERE id = sqlc.arg('pairing_code_id')::uuid
   AND used_at IS NULL
+  and expired_at > now()
 RETURNING *;
 
 -- name: RevokePairingCode :one

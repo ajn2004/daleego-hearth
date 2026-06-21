@@ -21,9 +21,6 @@ type LocationRequest struct {
 }
 
 func (h *Handler) ReportLocation(w http.ResponseWriter, r *http.Request) {
-	// device identity comes from middleware
-	// parse location payload
-	// call h.LocationService.CreateLocation(...)
 	var req LocationRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		response.WriteError(w, http.StatusBadRequest, "invalid payload")

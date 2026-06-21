@@ -69,16 +69,10 @@ const getLocationByID = `-- name: GetLocationByID :one
 SELECT id, lat, lng, accuracy, recorded_at, received_at, device_id, person_id, created_at
   FROM locations
  WHERE id = $1::uuid
-   AND person_id = $2::uuid
 `
 
-type GetLocationByIDParams struct {
-	LocationID pgtype.UUID `json:"location_id"`
-	PersonID   pgtype.UUID `json:"person_id"`
-}
-
-func (q *Queries) GetLocationByID(ctx context.Context, arg GetLocationByIDParams) (Location, error) {
-	row := q.db.QueryRow(ctx, getLocationByID, arg.LocationID, arg.PersonID)
+func (q *Queries) GetLocationByID(ctx context.Context, locationID pgtype.UUID) (Location, error) {
+	row := q.db.QueryRow(ctx, getLocationByID, locationID)
 	var i Location
 	err := row.Scan(
 		&i.ID,

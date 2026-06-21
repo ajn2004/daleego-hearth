@@ -30,7 +30,7 @@ type Querier interface {
 	GetDeviceByID(ctx context.Context, deviceID pgtype.UUID) (Device, error)
 	GetDevicesByPersonID(ctx context.Context, personID pgtype.UUID) ([]Device, error)
 	GetExpiredPairings(ctx context.Context) ([]DevicePairingCode, error)
-	GetLocationByID(ctx context.Context, arg GetLocationByIDParams) (Location, error)
+	GetLocationByID(ctx context.Context, locationID pgtype.UUID) (Location, error)
 	GetPairingCodeByID(ctx context.Context, pairingCodeID pgtype.UUID) (DevicePairingCode, error)
 	GetPersonByID(ctx context.Context, personID pgtype.UUID) (Person, error)
 	GetPersonLocations(ctx context.Context, personID pgtype.UUID) ([]Location, error)

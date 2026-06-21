@@ -21,8 +21,7 @@ RETURNING *;
 -- name: GetLocationByID :one
 SELECT *
   FROM locations
- WHERE id = sqlc.arg('location_id')::uuid
-   AND person_id = sqlc.arg('person_id')::uuid;
+ WHERE id = sqlc.arg('location_id')::uuid;
 
 -- name: GetPersonLocations :many
 SELECT *
