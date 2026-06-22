@@ -10,7 +10,6 @@ import (
 	"github.com/ajn2004/daleego-hearth/backend/internal/authkeys"
 	"github.com/ajn2004/daleego-hearth/backend/internal/db"
 	"github.com/ajn2004/daleego-hearth/backend/internal/httpapi/response"
-	httputil "github.com/ajn2004/daleego-hearth/backend/internal/httpapi/utils"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -40,11 +39,7 @@ func (h *Handler) PairDevice(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// hash pairing code
-	codeHash, err := httputil.HashValue(pairCode)
-	if err != nil {
-		response.WriteError(w, http.StatusInternalServerError, "could not hash code")
-		return
-	}
+	codeHash := authkeys.HashPairingCode(pairCode, h.pairingCodeSecret)
 
 	// get pairing entry by code hash if entry exists, it is valid
 	pairEntry, err := h.queries.GetValidDevicePairingCodeByHash(r.Context(), codeHash)
@@ -102,7 +97,7 @@ func (h *Handler) PairDevice(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create device API key entry
-	_, err := qtx.CreateDeviceAPIKey(r.Context(), db.CreateDeviceAPIKeyParams{
+	_, err = qtx.CreateDeviceAPIKey(r.Context(), db.CreateDeviceAPIKeyParams{
 		DeviceID:  device.ID,
 		KeyHash:   deviceAPIKey.Hash,
 		KeyPrefix: deviceAPIKey.Prefix,
@@ -112,11 +107,11 @@ func (h *Handler) PairDevice(w http.ResponseWriter, r *http.Request) {
 		response.WriteError(w, http.StatusInternalServerError, "could not create api key record")
 		return
 	}
-
 	_, err = qtx.MarkDevicePairingCodeUsed(r.Context(), db.MarkDevicePairingCodeUsedParams{
 		DeviceID:      device.ID,
 		PairingCodeID: pairEntry.ID,
 	})
+
 	if err != nil {
 		response.WriteError(w, http.StatusInternalServerError, "could not mark pairing code used")
 		return

@@ -25,7 +25,7 @@ func main() {
 	defer pool.Close()
 	addr := ":" + cfg.Port
 	slog.Info("Starting api server", "addr", addr)
-	if err := http.ListenAndServe(addr, httpapi.NewRouter(pool, cfg.AdminAPIKey)); err != nil {
+	if err := http.ListenAndServe(addr, httpapi.NewRouter(pool, cfg.AdminAPIKey, cfg.PairingCodeSecret)); err != nil {
 		slog.Error("Failed to start server", "error", err)
 		os.Exit(1)
 	}

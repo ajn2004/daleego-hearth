@@ -7,12 +7,14 @@ import (
 )
 
 type Handler struct {
-	queries *db.Queries
+	queries           *db.Queries
+	pairingCodeSecret string
 }
 
-func NewHandler(queries *db.Queries) *Handler {
+func NewHandler(queries *db.Queries, PairingCodeSecret string) *Handler {
 	return &Handler{
-		queries: queries,
+		queries:           queries,
+		pairingCodeSecret: PairingCodeSecret,
 	}
 }
 

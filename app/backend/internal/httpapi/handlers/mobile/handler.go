@@ -8,13 +8,16 @@ import (
 )
 
 type Handler struct {
-	queries *db.Queries
-	dbPool  *pgxpool.Pool
+	queries           *db.Queries
+	dbPool            *pgxpool.Pool
+	pairingCodeSecret string
 }
 
-func NewHandler(queries *db.Queries) *Handler {
+func NewHandler(queries *db.Queries, dbPool *pgxpool.Pool, PairingCodeSecret string) *Handler {
 	return &Handler{
-		queries: queries,
+		queries:           queries,
+		dbPool:            dbPool,
+		pairingCodeSecret: PairingCodeSecret,
 	}
 }
 

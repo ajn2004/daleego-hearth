@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ajn2004/daleego-hearth/backend/internal/authkeys"
 	"github.com/ajn2004/daleego-hearth/backend/internal/db"
 	"github.com/ajn2004/daleego-hearth/backend/internal/httpapi/response"
 	httputil "github.com/ajn2004/daleego-hearth/backend/internal/httpapi/utils"
@@ -99,11 +100,7 @@ func (h *Handler) CreatePairing(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	hashedCode, err := httputil.HashValue(genCode)
-	if err != nil {
-		response.WriteError(w, http.StatusInternalServerError, "failed to hash code")
-		return
-	}
+	hashedCode := authkeys.HashPairingCode(genCode, h.pairingCodeSecret)
 
 	expiresAt := time.Now().UTC().Add(15 * time.Minute)
 	pairing, err := h.queries.CreateDevicePairingCode(r.Context(), db.CreateDevicePairingCodeParams{

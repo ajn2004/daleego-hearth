@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/ajn2004/daleego-hearth/backend/internal/httpapi/handlers/admin"
+	"github.com/ajn2004/daleego-hearth/backend/internal/httpapi/handlers/mobile"
 	"github.com/ajn2004/daleego-hearth/backend/internal/httpapi/response"
 	"github.com/ajn2004/daleego-hearth/backend/internal/middleware"
 	"github.com/go-chi/chi/v5"
@@ -12,7 +13,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewRouter(dbPool *pgxpool.Pool, AdminAPIKey string) http.Handler {
+func NewRouter(dbPool *pgxpool.Pool, AdminAPIKey string, PairingCodeSecret string) http.Handler {
 	s := NewServer(dbPool)
 
 	r := chi.NewRouter()
@@ -29,13 +30,19 @@ func NewRouter(dbPool *pgxpool.Pool, AdminAPIKey string) http.Handler {
 		MaxAge:           3000,
 	}))
 
-	adminHandler := admin.NewHandler(s.Queries)
+	adminHandler := admin.NewHandler(s.Queries, PairingCodeSecret)
 
 	r.Get("/ping", s.ping)
-	// r.Mount("/admin", adminHandler.Routes())
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.AdminAPIKey(AdminAPIKey))
 		r.Mount("/admin", adminHandler.Routes())
+	})
+
+	mobileHandler := mobile.NewHandler(s.Queries, s.DB, PairingCodeSecret)
+
+	r.Group(func(r chi.Router) {
+		// r.Use(middleware.DeviceAuth)
+		r.Mount("/mobile", mobileHandler.Routes())
 	})
 
 	return r

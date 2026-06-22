@@ -6,9 +6,10 @@ import (
 )
 
 type Config struct {
-	Port        string
-	DatabaseURL string
-	AdminAPIKey string
+	Port              string
+	DatabaseURL       string
+	AdminAPIKey       string
+	PairingCodeSecret string
 }
 
 func Load() (Config, error) {
@@ -20,6 +21,7 @@ func Load() (Config, error) {
 	dbName := os.Getenv("DB_NAME")
 	dbSSLMode := os.Getenv("DB_SSLMODE")
 	AdminAPIKey := os.Getenv("ADMIN_API_KEY")
+	PairingCodeSecret := os.Getenv("PAIRING_CODE_SECRET")
 
 	if dbUser == "" {
 		return Config{}, fmt.Errorf("DB_USER environment variable is required")
@@ -46,6 +48,9 @@ func Load() (Config, error) {
 	if AdminAPIKey == "" {
 		return Config{}, fmt.Errorf("ADMIN_API_KEY environment variable is required")
 	}
+	if PairingCodeSecret == "" {
+		return Config{}, fmt.Errorf("PAIRING_CODE_SECRET environment variable is required")
+	}
 
 	databaseURL := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=%s",
@@ -57,9 +62,10 @@ func Load() (Config, error) {
 		dbSSLMode,
 	)
 	cfg := Config{
-		Port:        os.Getenv("PORT"),
-		DatabaseURL: databaseURL,
-		AdminAPIKey: AdminAPIKey,
+		Port:              os.Getenv("PORT"),
+		DatabaseURL:       databaseURL,
+		AdminAPIKey:       AdminAPIKey,
+		PairingCodeSecret: PairingCodeSecret,
 	}
 
 	if cfg.Port == "" {

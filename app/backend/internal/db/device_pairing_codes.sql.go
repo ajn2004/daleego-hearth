@@ -164,10 +164,10 @@ const markDevicePairingCodeUsed = `-- name: MarkDevicePairingCodeUsed :one
 UPDATE device_pairing_codes
 SET
   used_at = now(),
-  used_by_device_id = $1::uuid
+  used_by_device = $1::uuid
 WHERE id = $2::uuid
   AND used_at IS NULL
-  and expired_at > now()
+  and expires_at > now()
 RETURNING id, person_id, code_hash, used_by_device, expires_at, used_at, created_at
 `
 
