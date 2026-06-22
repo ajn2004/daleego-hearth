@@ -3,11 +3,15 @@ package mobile
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
+	"time"
 
 	"github.com/ajn2004/daleego-hearth/backend/internal/db"
+	"github.com/ajn2004/daleego-hearth/backend/internal/httpapi/requestctx"
 	"github.com/ajn2004/daleego-hearth/backend/internal/httpapi/response"
 	"github.com/go-chi/chi/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 func (h *Handler) registerLocationRoutes(r chi.Router) {
@@ -15,9 +19,10 @@ func (h *Handler) registerLocationRoutes(r chi.Router) {
 }
 
 type LocationRequest struct {
-	Lat float64 `json:"lat"`
-	Lng float64 `json:"lng"`
-	Acc float64 `json:"acc"`
+	Latitude   float64   `json:"lat"`
+	Longitude  float64   `json:"lng"`
+	Accuracy   float64   `json:"accuracy"`
+	RecordedAt time.Time `json:"recorded_at"`
 }
 
 func (h *Handler) ReportLocation(w http.ResponseWriter, r *http.Request) {
@@ -30,12 +35,22 @@ func (h *Handler) ReportLocation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	device, ok := requestctx.CurrentDevice(r)
+	if !ok {
+		log.Printf("Failed to find device in context")
+		response.WriteError(w, http.StatusInternalServerError, "could not find device in context")
+		return
+	}
 	location, err := h.queries.CreateLocation(r.Context(), db.CreateLocationParams{
-		Lat:      req.Lat,
-		Lng:      req.Lng,
-		Accuracy: req.Acc,
+		Lat:        req.Latitude,
+		Lng:        req.Longitude,
+		Accuracy:   req.Accuracy,
+		RecordedAt: pgtype.Timestamptz{Valid: true, Time: req.RecordedAt},
+		DeviceID:   device.ID,
+		PersonID:   device.PersonID,
 	})
 	if err != nil {
+		log.Printf("mark pairing used error: %v", err)
 		response.WriteError(w, http.StatusInternalServerError, "could not record location")
 		return
 	}

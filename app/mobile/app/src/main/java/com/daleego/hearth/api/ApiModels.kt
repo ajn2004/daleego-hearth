@@ -34,7 +34,12 @@ data class DeviceDto(
 data class LocationRequest(
     val lat: Double,
     val lng: Double,
-    val acc: Double
+
+    @Json(name = "accuracy")
+    val accuracy: Double,
+
+    @Json(name = "recorded_at")
+    val recordedAt: String
 )
 
 data class LocationResponse(

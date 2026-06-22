@@ -12,7 +12,7 @@ INSERT INTO device_api_keys (
 )
 RETURNING *;
 
--- name: GetActiveDeviceAPIKeysByPrefix :many
+-- name: GetActiveDeviceAPIKeysByPrefix :one
 SELECT *
 FROM device_api_keys
 WHERE key_prefix = sqlc.arg('key_prefix')

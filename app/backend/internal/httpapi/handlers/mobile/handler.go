@@ -3,6 +3,7 @@ package mobile
 
 import (
 	"github.com/ajn2004/daleego-hearth/backend/internal/db"
+	"github.com/ajn2004/daleego-hearth/backend/internal/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -21,10 +22,13 @@ func NewHandler(queries *db.Queries, dbPool *pgxpool.Pool, PairingCodeSecret str
 	}
 }
 
-func (h *Handler) Routes() chi.Router {
+func (h *Handler) Routes(queries *db.Queries) chi.Router {
 	r := chi.NewRouter()
 
-	h.registerLocationRoutes(r)
 	h.registerPairingRoutes(r)
+	r.Group(func(r chi.Router) {
+		r.Use(middleware.DeviceAuth(queries))
+		h.registerLocationRoutes(r)
+	})
 	return r
 }

@@ -5,7 +5,9 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
+	"errors"
 	"fmt"
+	"strings"
 )
 
 type DeviceAPIKey struct {
@@ -28,14 +30,37 @@ func GenerateDeviceAPIKey() (DeviceAPIKey, error) {
 	prefix := base64.RawURLEncoding.EncodeToString(prefixBytes)
 	secret := base64.RawURLEncoding.EncodeToString(secretBytes)
 
-	plaintext := fmt.Sprintf("hearth_dev_%s_%s", prefix, secret)
+	plaintext := fmt.Sprintf("hearth_dev_%s.%s", prefix, secret)
 
-	sum := sha256.Sum256([]byte(plaintext))
-	hash := hex.EncodeToString(sum[:])
+	hash := HashDeviceAPIKey(plaintext)
 
 	return DeviceAPIKey{
 		Plaintext: plaintext,
 		Prefix:    prefix,
 		Hash:      hash,
 	}, nil
+}
+
+func HashDeviceAPIKey(plaintext string) string {
+	sum := sha256.Sum256([]byte(plaintext))
+	return hex.EncodeToString(sum[:])
+}
+
+func ExtractDeviceAPIKeyPrefix(plaintext string) (string, error) {
+	plaintext = strings.TrimSpace(plaintext)
+	prePart := strings.Split(plaintext, "_dev_")
+	parts := strings.Split(prePart[1], ".")
+	if len(parts) != 2 {
+		return "", errors.New("invalid device api key format")
+	}
+
+	if prePart[0] != "hearth" {
+		return "", errors.New("invalid device api key prefix")
+	}
+
+	if parts[0] == "" || parts[1] == "" {
+		return "", errors.New("invalid device api key format")
+	}
+
+	return parts[0], nil
 }

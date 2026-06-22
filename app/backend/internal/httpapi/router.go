@@ -41,8 +41,8 @@ func NewRouter(dbPool *pgxpool.Pool, AdminAPIKey string, PairingCodeSecret strin
 	mobileHandler := mobile.NewHandler(s.Queries, s.DB, PairingCodeSecret)
 
 	r.Group(func(r chi.Router) {
-		// r.Use(middleware.DeviceAuth)
-		r.Mount("/mobile", mobileHandler.Routes())
+		// r.Use(middleware.DeviceAuth(s.Queries))
+		r.Mount("/mobile", mobileHandler.Routes(s.Queries))
 	})
 
 	return r

@@ -17,16 +17,21 @@ import com.daleego.hearth.api.readableApiError
 import com.daleego.hearth.auth.DeviceCredentialStore
 import com.daleego.hearth.ui.HomeScreen
 import com.daleego.hearth.ui.PairingScreen
+import com.daleego.hearth.BuildConfig
 import kotlinx.coroutines.launch
+import java.time.Instant
 
-private const val BASE_URL = "http://192.168.0.252:8080/"
+private const val BASE_URL = BuildConfig.HEARTH_BASE_URL
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val credentials = DeviceCredentialStore(this)
-        val api: HearthApi = HearthApiClient.create(BASE_URL)
+        val api: HearthApi = HearthApiClient.create(
+            baseUrl = BASE_URL,
+            getDeviceApiKey = {credentials.getApiKey()}
+            )
 
         setContent {
             val scope = rememberCoroutineScope()
@@ -82,12 +87,13 @@ class MainActivity : ComponentActivity() {
                                     LocationRequest(
                                         lat = 0.0,
                                         lng = 0.0,
-                                        acc = 0.0
+                                        accuracy = 0.0,
+                                        recordedAt = Instant.now().toString()
                                     )
                                 )
                                 checkInStatus = "Test check-in sent."
                             } catch (throwable: Exception) {
-                                checkInStatus = throwable.message ?: "Failed to send test check-in."
+                                checkInStatus = readableApiError(throwable)
                             } finally {
                                 isCheckInLoading = false
                             }

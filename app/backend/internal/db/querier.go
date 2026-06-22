@@ -24,7 +24,7 @@ type Querier interface {
 	// queries/people.sql
 	CreatePerson(ctx context.Context, displayName string) (Person, error)
 	DeleteDevice(ctx context.Context, deviceID pgtype.UUID) (Device, error)
-	GetActiveDeviceAPIKeysByPrefix(ctx context.Context, keyPrefix string) ([]DeviceApiKey, error)
+	GetActiveDeviceAPIKeysByPrefix(ctx context.Context, keyPrefix string) (DeviceApiKey, error)
 	GetActivePairings(ctx context.Context) ([]DevicePairingCode, error)
 	GetAllDevices(ctx context.Context) ([]Device, error)
 	GetDeviceByID(ctx context.Context, deviceID pgtype.UUID) (Device, error)
@@ -40,7 +40,7 @@ type Querier interface {
 	RevokeDeviceAPIKeys(ctx context.Context, deviceID pgtype.UUID) ([]DeviceApiKey, error)
 	RevokePairingCode(ctx context.Context, pairingCodeID pgtype.UUID) (DevicePairingCode, error)
 	SetPersonToDeleted(ctx context.Context, personID pgtype.UUID) (Person, error)
-	UpdateDeviceLastSeen(ctx context.Context, arg UpdateDeviceLastSeenParams) (Device, error)
+	UpdateDeviceLastSeen(ctx context.Context, deviceID pgtype.UUID) (Device, error)
 	UpdatePersonName(ctx context.Context, arg UpdatePersonNameParams) (Person, error)
 }
 

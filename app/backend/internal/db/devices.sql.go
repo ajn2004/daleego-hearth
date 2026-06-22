@@ -179,18 +179,12 @@ SET
   last_seen_at = now(),
   updated_at = now()
 WHERE id = $1::uuid
-  AND person_id = $2::uuid
   AND deleted_at IS NULL
       RETURNING id, person_id, name, platform, last_seen_at, created_at, updated_at, deactivated_at, deleted_at
 `
 
-type UpdateDeviceLastSeenParams struct {
-	DeviceID pgtype.UUID `json:"device_id"`
-	PersonID pgtype.UUID `json:"person_id"`
-}
-
-func (q *Queries) UpdateDeviceLastSeen(ctx context.Context, arg UpdateDeviceLastSeenParams) (Device, error) {
-	row := q.db.QueryRow(ctx, updateDeviceLastSeen, arg.DeviceID, arg.PersonID)
+func (q *Queries) UpdateDeviceLastSeen(ctx context.Context, deviceID pgtype.UUID) (Device, error) {
+	row := q.db.QueryRow(ctx, updateDeviceLastSeen, deviceID)
 	var i Device
 	err := row.Scan(
 		&i.ID,

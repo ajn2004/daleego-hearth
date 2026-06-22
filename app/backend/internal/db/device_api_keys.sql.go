@@ -47,39 +47,26 @@ func (q *Queries) CreateDeviceAPIKey(ctx context.Context, arg CreateDeviceAPIKey
 	return i, err
 }
 
-const getActiveDeviceAPIKeysByPrefix = `-- name: GetActiveDeviceAPIKeysByPrefix :many
+const getActiveDeviceAPIKeysByPrefix = `-- name: GetActiveDeviceAPIKeysByPrefix :one
 SELECT id, device_id, key_hash, key_prefix, created_at, last_used_at, revoked_at
 FROM device_api_keys
 WHERE key_prefix = $1
   AND revoked_at IS NULL
 `
 
-func (q *Queries) GetActiveDeviceAPIKeysByPrefix(ctx context.Context, keyPrefix string) ([]DeviceApiKey, error) {
-	rows, err := q.db.Query(ctx, getActiveDeviceAPIKeysByPrefix, keyPrefix)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []DeviceApiKey
-	for rows.Next() {
-		var i DeviceApiKey
-		if err := rows.Scan(
-			&i.ID,
-			&i.DeviceID,
-			&i.KeyHash,
-			&i.KeyPrefix,
-			&i.CreatedAt,
-			&i.LastUsedAt,
-			&i.RevokedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) GetActiveDeviceAPIKeysByPrefix(ctx context.Context, keyPrefix string) (DeviceApiKey, error) {
+	row := q.db.QueryRow(ctx, getActiveDeviceAPIKeysByPrefix, keyPrefix)
+	var i DeviceApiKey
+	err := row.Scan(
+		&i.ID,
+		&i.DeviceID,
+		&i.KeyHash,
+		&i.KeyPrefix,
+		&i.CreatedAt,
+		&i.LastUsedAt,
+		&i.RevokedAt,
+	)
+	return i, err
 }
 
 const markDeviceAPIKeyUsed = `-- name: MarkDeviceAPIKeyUsed :exec

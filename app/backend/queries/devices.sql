@@ -44,6 +44,5 @@ SET
   last_seen_at = now(),
   updated_at = now()
 WHERE id = sqlc.arg('device_id')::uuid
-  AND person_id = sqlc.arg('person_id')::uuid
   AND deleted_at IS NULL
       RETURNING *;

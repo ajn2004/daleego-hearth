@@ -1,7 +1,16 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
+}
+
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.inputStream().use { load(it) }
+    }
 }
 
 android {
@@ -14,14 +23,22 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "0.1.0"
+
+        val hearthBaseUrl = localProperties.getProperty(
+            "HEARTH_BASE_URL",
+            "http://10.0.2.2:8080/"
+        )
+
+        buildConfigField(
+            "String",
+            "HEARTH_BASE_URL",
+            "\"$hearthBaseUrl\""
+        )
     }
 
     buildFeatures {
         compose = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.14"
+        buildConfig = true
     }
 
     compileOptions {
