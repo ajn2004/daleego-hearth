@@ -21,6 +21,9 @@ fun HomeScreen(
     deviceName: String?,
     checkInStatus: String?,
     isCheckInLoading: Boolean,
+    isTracking: Boolean,
+    onStartTracking: () -> Unit,
+    onStopTracking: () -> Unit,
     onSendTestCheckIn: () -> Unit,
     onUnpair: () -> Unit
 ) {
@@ -49,6 +52,18 @@ fun HomeScreen(
                 text = deviceName,
                 style = MaterialTheme.typography.bodyMedium
             )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        if (isTracking) {
+            Button(onClick = onStopTracking) {
+                Text("Stop location tracking")
+            }
+        } else {
+            Button(onClick = onStartTracking) {
+                Text("Start location tracking")
+            }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
